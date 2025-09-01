@@ -21,15 +21,14 @@ jobs:
       - name: Install dev deps
         run: pip install -r requirements-dev.txt
 
-      # 1) Formatare automată (nu e strict necesar să rulezi și black și ruff format,
-      #   dar păstrăm ambele ca să mimăm setup-ul tău curent; ruff format e foarte rapid)
+      # Aplică automat formatările Ruff și Black
       - name: Ruff (format)
         run: ruff format .
 
       - name: Black (format)
         run: black .
 
-      # 2) Lint după formatare (ar trebui să fie curat)
+      # Verifică dacă a rămas ceva nelintuit
       - name: Ruff (check)
         run: ruff check .
 
