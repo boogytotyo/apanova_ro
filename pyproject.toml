@@ -6,6 +6,15 @@ exclude = "\\.venv|build|dist"
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-select = ["E","F","I","B","UP"]
+
+[tool.ruff.lint]
+# reguli principale (păstrăm ce ai folosit deja)
+select = ["E", "F", "I", "B", "UP"]
 ignore = ["E501"]
-exclude = ["build","dist",".venv"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["custom_components.apanova_ro"]
+
+[tool.ruff.format]
+# lăsăm formatterul ruff activ (lucrează împreună cu black)
+docstring-code-format = true
