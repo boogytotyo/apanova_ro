@@ -7,14 +7,7 @@
   "iot_class": "cloud_polling",
   "config_flow": true,
   "integration_type": "hub",
-  "requirements": [
-    "aiohttp>=3.9.1"
-  ],
-  "codeowners": [
-    "@boogytotyo"
-  ],
-  "loggers": [
-    "custom_components.apanova_ro"
-  ],
-  "icon": "https://brands.home-assistant.io/_/apanova_ro/icon.png"
+  "requirements": ["aiohttp>=3.9.1"],
+  "codeowners": ["@boogytotyo"],
+  "loggers": ["custom_components.apanova_ro"]
 }
