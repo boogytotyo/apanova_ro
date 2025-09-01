@@ -1,0 +1,6 @@
+homeassistant>=2024.6.0
+pytest
+pytest-homeassistant-custom-component
+ruff>=0.4.0
+black>=24.4.0
+aiohttp>=3.9.1
