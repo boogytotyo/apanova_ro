@@ -10,9 +10,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build zip artifact
+      - name: Build zip artifact (HACS-compatible)
         run: |
           mkdir -p build
+          # github.ref_name e chiar tag-ul, ex: v0.6.5
           zip -r "build/apanova_ro-${GITHUB_REF_NAME}.zip" custom_components/apanova_ro
 
       - name: Publish GitHub Release
