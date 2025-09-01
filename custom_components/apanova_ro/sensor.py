@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 import logging
 from datetime import datetime
@@ -13,15 +12,27 @@ from .api import _content
 _LOGGER = logging.getLogger(__name__)
 
 RO_MONTHS = {
-    1: "ianuarie", 2: "februarie", 3: "martie", 4: "aprilie", 5: "mai", 6: "iunie",
-    7: "iulie", 8: "august", 9: "septembrie", 10: "octombrie", 11: "noiembrie", 12: "decembrie"
+    1: "ianuarie",
+    2: "februarie",
+    3: "martie",
+    4: "aprilie",
+    5: "mai",
+    6: "iunie",
+    7: "iulie",
+    8: "august",
+    9: "septembrie",
+    10: "octombrie",
+    11: "noiembrie",
+    12: "decembrie",
 }
+
 
 def money_num(v) -> float:
     try:
         return float(str(v).replace(",", "."))
     except Exception:
         return 0.0
+
 
 def money(v) -> str:
     try:
@@ -32,6 +43,7 @@ def money(v) -> str:
     except Exception:
         return f"{v}"
 
+
 def money_state(v) -> str:
     try:
         x = float(str(v).replace(",", "."))
@@ -40,47 +52,64 @@ def money_state(v) -> str:
     except Exception:
         return "0,00"
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback):
+
+async def async_setup_entry(
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+):
     data = hass.data[DOMAIN][entry.entry_id]
     coordinator = data["coordinator"]
-    async_add_entities([
-        ApanovaDateUtilizatorSensor(coordinator, entry),
-        ApanovaArhivaFacturiSensor(coordinator, entry),
-        ApanovaFacturaRestantaSensor(coordinator, entry),
-        ApanovaIndexCurentSensor(coordinator, entry),
-        ApanovaIstoricIndexSensor(coordinator, entry),
-        ApanovaCalitateApaSensor(coordinator, entry),
-        ApanovaUpdateSensor(coordinator, entry),
-    ], True)
+    async_add_entities(
+        [
+            ApanovaDateUtilizatorSensor(coordinator, entry),
+            ApanovaArhivaFacturiSensor(coordinator, entry),
+            ApanovaFacturaRestantaSensor(coordinator, entry),
+            ApanovaIndexCurentSensor(coordinator, entry),
+            ApanovaIstoricIndexSensor(coordinator, entry),
+            ApanovaCalitateApaSensor(coordinator, entry),
+            ApanovaUpdateSensor(coordinator, entry),
+        ],
+        True,
+    )
+
 
 class BaseApanovaSensor(SensorEntity):
     _attr_has_entity_name = True
+
     def __init__(self, coordinator, entry):
         self.coordinator = coordinator
         self._entry = entry
+
     @property
     def available(self) -> bool:
         return self.coordinator.last_update_success
+
     async def async_update(self):
         await self.coordinator.async_request_refresh()
+
     @property
     def should_poll(self) -> bool:
         return False
+
     async def async_added_to_hass(self) -> None:
         self.async_on_remove(self.coordinator.async_add_listener(self.async_write_ha_state))
+
 
 class ApanovaDateUtilizatorSensor(BaseApanovaSensor):
     _attr_icon = "mdi:account"
     _attr_name = "Apanova – Date utilizator/contract"
+
     def __init__(self, coordinator, entry):
         super().__init__(coordinator, entry)
         self.entity_id = "sensor.apanova_date_utilizator"
+
     @property
     def unique_id(self) -> str:
         return f"{self._entry.entry_id}_date_utilizator"
+
     @property
     def native_value(self):
         return (self.coordinator.data.get("cod") or "").lstrip("0")
+
     @property
     def extra_state_attributes(self) -> Dict[str, Any]:
         d = self.coordinator.data
@@ -105,7 +134,11 @@ class ApanovaDateUtilizatorSensor(BaseApanovaSensor):
         name = f"{ln} {fn}".strip() or None
         phone = payload.get("mobile")
         client_number = payload.get("clientNumber") or d.get("cod")
-        contract_nr = payload.get("contractNumber") or contract.get("ContractNumberWithAnb") or contract.get("ContractNumber")
+        contract_nr = (
+            payload.get("contractNumber")
+            or contract.get("ContractNumberWithAnb")
+            or contract.get("ContractNumber")
+        )
 
         return {
             "email": email,
@@ -121,15 +154,19 @@ class ApanovaDateUtilizatorSensor(BaseApanovaSensor):
             "friendly_name": "Apanova – Date utilizator/contract",
         }
 
+
 class ApanovaArhivaFacturiSensor(BaseApanovaSensor):
     _attr_icon = "mdi:cash-register"
     _attr_name = "Apanova – Arhivă facturi"
+
     def __init__(self, coordinator, entry):
         super().__init__(coordinator, entry)
         self.entity_id = "sensor.apanova_arhiva_facturi"
+
     @property
     def unique_id(self) -> str:
         return f"{self._entry.entry_id}_arhiva_facturi"
+
     @property
     def native_value(self):
         inv = _content(self.coordinator.data.get("invoices") or {})
@@ -148,6 +185,7 @@ class ApanovaArhivaFacturiSensor(BaseApanovaSensor):
                     latest_dt = dt
                     latest = amt
         return money_state(latest) if latest is not None else "0,00"
+
     @property
     def extra_state_attributes(self) -> Dict[str, Any]:
         inv = _content(self.coordinator.data.get("invoices") or {})
@@ -163,10 +201,23 @@ class ApanovaArhivaFacturiSensor(BaseApanovaSensor):
                     months[key] = money(amt)
                 except Exception:
                     continue
-        count = len([k for k in months.keys() if k not in ("──────────","Plăți efectuate","Total suma achitată","icon","friendly_name")])
+        count = len(
+            [
+                k
+                for k in months.keys()
+                if k
+                not in (
+                    "──────────",
+                    "Plăți efectuate",
+                    "Total suma achitată",
+                    "icon",
+                    "friendly_name",
+                )
+            ]
+        )
         total = 0.0
         for v in months.values():
-            num = v.replace(" lei","").replace(".","").replace(",",".")
+            num = v.replace(" lei", "").replace(".", "").replace(",", ".")
             try:
                 total += float(num)
             except Exception:
@@ -178,15 +229,19 @@ class ApanovaArhivaFacturiSensor(BaseApanovaSensor):
         months["friendly_name"] = "Apanova – Arhivă facturi"
         return months
 
+
 class ApanovaFacturaRestantaSensor(BaseApanovaSensor):
     _attr_icon = "mdi:file-document-alert"
     _attr_name = "Apanova – Valoare factură restantă"
+
     def __init__(self, coordinator, entry):
         super().__init__(coordinator, entry)
         self.entity_id = "sensor.apanova_factura_restanta"
+
     @property
     def unique_id(self) -> str:
         return f"{self._entry.entry_id}_factura_restanta"
+
     @property
     def native_value(self):
         unpaid = _content(self.coordinator.data.get("unpaid") or {})
@@ -208,6 +263,7 @@ class ApanovaFacturaRestantaSensor(BaseApanovaSensor):
                 latest_dt = dt
                 latest_val = v
         return money_state(latest_val) if latest_val is not None else "0,00"
+
     @property
     def extra_state_attributes(self) -> Dict[str, Any]:
         unpaid = _content(self.coordinator.data.get("unpaid") or {})
@@ -224,19 +280,21 @@ class ApanovaFacturaRestantaSensor(BaseApanovaSensor):
         total = 0.0
         cnt = 0
         amounts: List[str] = []
+
         def get_dt(it):
             d = it.get("DateIn") or it.get("InvoiceDate") or it.get("date")
             try:
                 return datetime.fromisoformat(str(d)[:10])
             except Exception:
                 return datetime.min
+
         for it in sorted(items, key=get_dt):
             v = it.get("Sold") or it.get("Total") or it.get("value") or it.get("amount")
-            if v is None: 
+            if v is None:
                 continue
             cnt += 1
             total += money_num(v)
-            amounts.append(money(v).replace(" lei",""))
+            amounts.append(money(v).replace(" lei", ""))
         for a in amounts:
             attrs[a] = ""
         attrs["──────────"] = ""
@@ -246,15 +304,19 @@ class ApanovaFacturaRestantaSensor(BaseApanovaSensor):
         attrs["friendly_name"] = "Apanova – Valoare factură restantă"
         return attrs
 
+
 class ApanovaIndexCurentSensor(BaseApanovaSensor):
     _attr_icon = "mdi:counter"
     _attr_name = "Apanova – Index curent"
+
     def __init__(self, coordinator, entry):
         super().__init__(coordinator, entry)
         self.entity_id = "sensor.apanova_index_curent"
+
     @property
     def unique_id(self) -> str:
         return f"{self._entry.entry_id}_index_curent"
+
     @property
     def native_value(self):
         chk = _content(self.coordinator.data.get("check") or {})
@@ -273,6 +335,7 @@ class ApanovaIndexCurentSensor(BaseApanovaSensor):
                 except Exception:
                     return v
         return None
+
     @property
     def extra_state_attributes(self) -> Dict[str, Any]:
         chk = _content(self.coordinator.data.get("check") or {})
@@ -281,11 +344,13 @@ class ApanovaIndexCurentSensor(BaseApanovaSensor):
             l = chk.get("MeterReadingDetails") or []
             if isinstance(l, list) and l:
                 details = l[0]
+
         def pick(o, *ks):
             for k in ks:
                 if isinstance(o, dict) and k in o and o[k] is not None:
                     return o[k]
             return None
+
         return {
             "cod_loc_consum": pick(details or {}, "ConsumptionPointIdentifier"),
             "ultima_citire": pick(details or {}, "LastIndexDate"),
@@ -296,15 +361,19 @@ class ApanovaIndexCurentSensor(BaseApanovaSensor):
             "friendly_name": "Apanova – Index curent",
         }
 
+
 class ApanovaIstoricIndexSensor(BaseApanovaSensor):
     _attr_icon = "mdi:counter"
     _attr_name = "Apanova – Istoric index"
+
     def __init__(self, coordinator, entry):
         super().__init__(coordinator, entry)
         self.entity_id = "sensor.apanova_istoric_index"
+
     @property
     def unique_id(self) -> str:
         return f"{self._entry.entry_id}_istoric_index"
+
     @property
     def native_value(self):
         attrs = self.extra_state_attributes
@@ -321,6 +390,7 @@ class ApanovaIstoricIndexSensor(BaseApanovaSensor):
                         except Exception:
                             pass
         return max(nums) if nums else None
+
     @property
     def extra_state_attributes(self) -> Dict[str, Any]:
         d = self.coordinator.data
@@ -329,7 +399,7 @@ class ApanovaIstoricIndexSensor(BaseApanovaSensor):
         try:
             points = hist.get("ConsumptionPoints") or []
             if points:
-                by_meter = (points[0].get("IndexHistoryByMeter") or [])
+                by_meter = points[0].get("IndexHistoryByMeter") or []
                 if by_meter:
                     entries = by_meter[0].get("MeterIndexList") or []
                     parsed = []
@@ -347,10 +417,27 @@ class ApanovaIstoricIndexSensor(BaseApanovaSensor):
                         except Exception:
                             continue
                     parsed.sort(key=lambda x: x[1])  # EndDate asc
+
                     def label(dt):
-                        if not dt: return ""
-                        return dt.strftime("%d %b").replace("May","Mai").replace("Jul","Iul").replace("Jun","Iun").replace("Aug","Aug").replace("Sep","Sep").replace("Oct","Oct").replace("Nov","Noi").replace("Dec","Dec").replace("Jan","Ian").replace("Feb","Feb").replace("Mar","Mar").replace("Apr","Apr")
-                    for (sdt, edt, idx, cons) in reversed(parsed):
+                        if not dt:
+                            return ""
+                        return (
+                            dt.strftime("%d %b")
+                            .replace("May", "Mai")
+                            .replace("Jul", "Iul")
+                            .replace("Jun", "Iun")
+                            .replace("Aug", "Aug")
+                            .replace("Sep", "Sep")
+                            .replace("Oct", "Oct")
+                            .replace("Nov", "Noi")
+                            .replace("Dec", "Dec")
+                            .replace("Jan", "Ian")
+                            .replace("Feb", "Feb")
+                            .replace("Mar", "Mar")
+                            .replace("Apr", "Apr")
+                        )
+
+                    for sdt, edt, idx, cons in reversed(parsed):
                         idxv = idx
                         try:
                             idxv = int(idx)
@@ -375,19 +462,24 @@ class ApanovaIstoricIndexSensor(BaseApanovaSensor):
         attrs["icon"] = "mdi:counter"
         return attrs
 
+
 class ApanovaCalitateApaSensor(BaseApanovaSensor):
     _attr_icon = "mdi:counter"
     _attr_name = "Apanova – Calitate apa"
+
     def __init__(self, coordinator, entry):
         super().__init__(coordinator, entry)
         self.entity_id = "sensor.apanova_calitate_apa"
+
     @property
     def unique_id(self) -> str:
         return f"{self._entry.entry_id}_calitate_apa"
+
     @property
     def native_value(self):
         water = _content(self.coordinator.data.get("water") or {})
         return water.get("LastUpdateDate")
+
     @property
     def extra_state_attributes(self) -> Dict[str, Any]:
         water = _content(self.coordinator.data.get("water") or {})
@@ -406,17 +498,22 @@ class ApanovaCalitateApaSensor(BaseApanovaSensor):
         attrs["icon"] = "mdi:counter"
         return attrs
 
+
 class ApanovaUpdateSensor(BaseApanovaSensor):
     _attr_name = "Apanova România update"
+
     def __init__(self, coordinator, entry):
         super().__init__(coordinator, entry)
         self.entity_id = "sensor.apanova_ro_update"
+
     @property
     def unique_id(self) -> str:
         return f"{self._entry.entry_id}_update"
+
     @property
     def native_value(self):
         return f"v{VERSION}"
+
     @property
     def extra_state_attributes(self) -> Dict[str, Any]:
         return {

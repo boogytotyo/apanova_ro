@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 import logging
 from datetime import datetime
@@ -9,17 +8,29 @@ from .const import USER_AGENT
 
 _LOGGER = logging.getLogger(__name__)
 
+
 class ApanovaError(Exception):
     pass
 
+
 def _explain_status(code: int) -> str:
-    m = {200:"OK (200)",400:"Cerere invalidă (400)",401:"Autentificare eșuată (401)",403:"Acces refuzat (403)",404:"Resursă inexistentă (404)",429:"Prea multe cereri (429)",0:"Eroare rețea (0)"}
+    m = {
+        200: "OK (200)",
+        400: "Cerere invalidă (400)",
+        401: "Autentificare eșuată (401)",
+        403: "Acces refuzat (403)",
+        404: "Resursă inexistentă (404)",
+        429: "Prea multe cereri (429)",
+        0: "Eroare rețea (0)",
+    }
     return m.get(code, f"HTTP {code}")
+
 
 def _content(o: Any) -> Any:
     if isinstance(o, dict) and "content" in o and o["content"] not in (None, {}):
         return o["content"]
     return o
+
 
 class ApanovaClient:
     def __init__(self, hass: HomeAssistant, cfg: Dict[str, Any]):
@@ -34,17 +45,21 @@ class ApanovaClient:
 
     async def _session_get(self) -> aiohttp.ClientSession:
         if self._session is None or self._session.closed:
-            self._session = aiohttp.ClientSession(headers={
-                "User-Agent": USER_AGENT,
-                "Accept": "application/json",
-            })
+            self._session = aiohttp.ClientSession(
+                headers={
+                    "User-Agent": USER_AGENT,
+                    "Accept": "application/json",
+                }
+            )
         return self._session
 
     async def close(self):
         if self._session and not self._session.closed:
             await self._session.close()
 
-    async def _fetch(self, method: str, url: str, data: Optional[dict]=None, use_auth: bool=True) -> dict:
+    async def _fetch(
+        self, method: str, url: str, data: Optional[dict] = None, use_auth: bool = True
+    ) -> dict:
         s = await self._session_get()
         headers = {}
         if data is not None:
@@ -59,7 +74,9 @@ class ApanovaClient:
             except Exception:
                 payload = {}
             if code >= 400:
-                raise ApanovaError(f"Eroare API {url} → {_explain_status(code)} // payload keys: {list(payload.keys())}")
+                raise ApanovaError(
+                    f"Eroare API {url} → {_explain_status(code)} // payload keys: {list(payload.keys())}"
+                )
             return payload
 
     async def login(self) -> None:
@@ -79,7 +96,11 @@ class ApanovaClient:
                 try:
                     data = await self._fetch("POST", u, p, use_auth=False)
                     token = data.get("accessToken") or data.get("token") or data.get("access_token")
-                    user_id = data.get("userId") or data.get("UserId") or (data.get("userData") or {}).get("UserId")
+                    user_id = (
+                        data.get("userId")
+                        or data.get("UserId")
+                        or (data.get("userData") or {}).get("UserId")
+                    )
                     if token:
                         self._token = token
                         self._user_id = user_id
@@ -97,7 +118,9 @@ class ApanovaClient:
         await self._ensure_login()
         if not self._user_id:
             try:
-                curr = await self._fetch("GET", "https://client-authorization.apanovabucuresti.ro/api/User")
+                curr = await self._fetch(
+                    "GET", "https://client-authorization.apanovabucuresti.ro/api/User"
+                )
                 uid = curr.get("userId") or (curr.get("userData") or {}).get("UserId")
                 if uid:
                     self._user_id = uid
@@ -105,12 +128,18 @@ class ApanovaClient:
                 pass
         if not self._user_id:
             return {}
-        details = await self._fetch("GET", f"https://client-authorization.apanovabucuresti.ro/api/User/{self._user_id}")
+        details = await self._fetch(
+            "GET", f"https://client-authorization.apanovabucuresti.ro/api/User/{self._user_id}"
+        )
         self._cached_user_details = details or {}
         return details
 
     async def get_cod_client(self) -> str:
-        payload = (self._cached_user_details.get("userData") or {}).get("Payload") if self._cached_user_details else {}
+        payload = (
+            (self._cached_user_details.get("userData") or {}).get("Payload")
+            if self._cached_user_details
+            else {}
+        )
         if isinstance(payload, dict):
             cod = payload.get("clientNumber")
             if cod:
@@ -122,14 +151,21 @@ class ApanovaClient:
         if isinstance(val, list) and val:
             val = val[0]
         elif isinstance(val, dict):
-            for k in ("codes","list","items","data","result","value","ClientNumber"):
+            for k in ("codes", "list", "items", "data", "result", "value", "ClientNumber"):
                 if k in val and val[k]:
                     val = val[k]
                     if isinstance(val, list) and val:
                         val = val[0]
                     break
         if isinstance(val, dict):
-            cod = val.get("cod") or val.get("code") or val.get("clientNumber") or val.get("ClientNumber") or val.get("id") or val.get("value")
+            cod = (
+                val.get("cod")
+                or val.get("code")
+                or val.get("clientNumber")
+                or val.get("ClientNumber")
+                or val.get("id")
+                or val.get("value")
+            )
         else:
             cod = val
         if not cod:
@@ -138,27 +174,43 @@ class ApanovaClient:
 
     async def get_consumption_points(self, cod: str) -> dict:
         await self._ensure_login()
-        return await self._fetch("GET", f"https://callistogateway.apanovabucuresti.ro/api/v2/apiclientconsumptionpoint/{cod}")
+        return await self._fetch(
+            "GET",
+            f"https://callistogateway.apanovabucuresti.ro/api/v2/apiclientconsumptionpoint/{cod}",
+        )
 
     async def get_contract(self, cod: str) -> dict:
         await self._ensure_login()
-        return await self._fetch("GET", f"https://callistogateway.apanovabucuresti.ro/api/v2/apiclientcontract/{cod}")
+        return await self._fetch(
+            "GET", f"https://callistogateway.apanovabucuresti.ro/api/v2/apiclientcontract/{cod}"
+        )
 
     async def get_payments(self, cod: str) -> dict:
         await self._ensure_login()
-        return await self._fetch("GET", f"https://callistogateway.apanovabucuresti.ro/api/v2/apiclientpayments/{cod}")
+        return await self._fetch(
+            "GET", f"https://callistogateway.apanovabucuresti.ro/api/v2/apiclientpayments/{cod}"
+        )
 
     async def get_unpaid(self, cod: str) -> dict:
         await self._ensure_login()
-        return await self._fetch("GET", f"https://callistogateway.apanovabucuresti.ro/api/v2/apiclientunpaidinvoices?clientNumber={cod}")
+        return await self._fetch(
+            "GET",
+            f"https://callistogateway.apanovabucuresti.ro/api/v2/apiclientunpaidinvoices?clientNumber={cod}",
+        )
 
     async def get_invoices_year(self, cod: str, year: int) -> dict:
         await self._ensure_login()
-        return await self._fetch("GET", f"https://callistogateway.apanovabucuresti.ro/api/v2/apiclientinvoices?clientNumber={cod}&dateFrom={year}-01-01&dateTo={year}-12-31")
+        return await self._fetch(
+            "GET",
+            f"https://callistogateway.apanovabucuresti.ro/api/v2/apiclientinvoices?clientNumber={cod}&dateFrom={year}-01-01&dateTo={year}-12-31",
+        )
 
     async def get_check_window(self, cod: str) -> dict:
         await self._ensure_login()
-        return await self._fetch("GET", f"https://callistogateway.apanovabucuresti.ro/api/v2/apiclientcheckmeterautoreading/{cod}")
+        return await self._fetch(
+            "GET",
+            f"https://callistogateway.apanovabucuresti.ro/api/v2/apiclientcheckmeterautoreading/{cod}",
+        )
 
     async def get_index_history(self, cod: str, loc: str, contor: str, year: int) -> dict:
         await self._ensure_login()
@@ -183,7 +235,8 @@ class ApanovaClient:
             info = self._first(c.get("ConsumptionPointInfo") or [])
             if isinstance(info, dict):
                 cm = info.get("ConsumptionMeters") or []
-                if cm: contor = str(self._first(cm))
+                if cm:
+                    contor = str(self._first(cm))
                 if not loc:
                     loc = str(info.get("ConsumptionPointCode") or "")
         ch = _content(check)

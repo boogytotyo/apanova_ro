@@ -1,4 +1,3 @@
-
 DOMAIN = "apanova_ro"
 PLATFORMS = ["sensor"]
 CONF_EMAIL = "email"
