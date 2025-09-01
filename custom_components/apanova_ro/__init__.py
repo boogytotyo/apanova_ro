@@ -1,16 +1,22 @@
-
 from __future__ import annotations
 import logging
 from datetime import timedelta
+
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.helpers import config_validation as cv
+
 from .const import DOMAIN, UPDATE_INTERVAL_MINUTES
 from .api import ApanovaClient
 
 _LOGGER = logging.getLogger(__name__)
 
+# ✅ declară schema pentru integrare „config-entry only”
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+    # optional: nu mai face nimic pe YAML; doar semnalăm că domeniul există
     return True
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
