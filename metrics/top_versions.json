@@ -1,6 +1,14 @@
 {
-  "generated_at": "2025-09-01T21:55:18.103Z",
+  "generated_at": "2025-09-01T23:05:36.429Z",
   "top": [
+    {
+      "tag": "0.6.6",
+      "name": "0.6.6",
+      "prerelease": false,
+      "published_at": "2025-09-01T23:05:29Z",
+      "downloads": 0,
+      "assets": []
+    },
     {
       "tag": "0.6.5",
       "name": "0.6.5",
