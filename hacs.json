@@ -1,10 +1,9 @@
 {
   "name": "Apanova România",
   "content_in_root": false,
-  "zip_release": true,
   "render_readme": true,
-  "domains": ["sensor"],
+  "zip_release": true,
   "filename": "apanova_ro-{{version}}.zip",
   "homeassistant": "2024.6.0",
-  "country": "RO"
+  "country": ["RO"]
 }
