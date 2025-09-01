@@ -1,0 +1,13 @@
+{
+  "title": "Apanova România",
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "email": "Email",
+          "password": "Parolă"
+        }
+      }
+    }
+  }
+}

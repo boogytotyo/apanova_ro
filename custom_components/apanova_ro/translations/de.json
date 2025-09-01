@@ -1,0 +1,13 @@
+{
+  "title": "Apanova Rumänien",
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "email": "E-Mail",
+          "password": "Passwort"
+        }
+      }
+    }
+  }
+}
