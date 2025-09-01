@@ -1,14 +1,15 @@
 from __future__ import annotations
+
 import logging
 from datetime import timedelta
 
-from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import DOMAIN, UPDATE_INTERVAL_MINUTES
 from .api import ApanovaClient
+from .const import DOMAIN, UPDATE_INTERVAL_MINUTES
 
 _LOGGER = logging.getLogger(__name__)
 

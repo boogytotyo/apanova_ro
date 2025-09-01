@@ -1,9 +1,12 @@
 from __future__ import annotations
+
 import logging
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any
+
 import aiohttp
 from homeassistant.core import HomeAssistant
+
 from .const import USER_AGENT
 
 _LOGGER = logging.getLogger(__name__)
@@ -33,15 +36,15 @@ def _content(o: Any) -> Any:
 
 
 class ApanovaClient:
-    def __init__(self, hass: HomeAssistant, cfg: Dict[str, Any]):
+    def __init__(self, hass: HomeAssistant, cfg: dict[str, Any]):
         self._hass = hass
         self._email = cfg.get("email")
         self._password = cfg.get("password")
-        self._token: Optional[str] = None
-        self._user_id: Optional[str] = None
-        self._session: Optional[aiohttp.ClientSession] = None
-        self._login_payload: Dict[str, Any] = {}
-        self._cached_user_details: Dict[str, Any] = {}
+        self._token: str | None = None
+        self._user_id: str | None = None
+        self._session: aiohttp.ClientSession | None = None
+        self._login_payload: dict[str, Any] = {}
+        self._cached_user_details: dict[str, Any] = {}
 
     async def _session_get(self) -> aiohttp.ClientSession:
         if self._session is None or self._session.closed:
@@ -58,7 +61,7 @@ class ApanovaClient:
             await self._session.close()
 
     async def _fetch(
-        self, method: str, url: str, data: Optional[dict] = None, use_auth: bool = True
+        self, method: str, url: str, data: dict | None = None, use_auth: bool = True
     ) -> dict:
         s = await self._session_get()
         headers = {}
@@ -90,7 +93,7 @@ class ApanovaClient:
             {"username": self._email, "password": self._password},
             {"BodyCredentials": {"Email": self._email, "Password": self._password}},
         ]
-        last_error: Optional[Exception] = None
+        last_error: Exception | None = None
         for u in urls:
             for p in payloads:
                 try:

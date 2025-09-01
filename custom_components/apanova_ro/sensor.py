@@ -94,9 +94,7 @@ class BaseApanovaSensor(SensorEntity):
         return False
 
     async def async_added_to_hass(self) -> None:
-        self.async_on_remove(
-            self.coordinator.async_add_listener(self.async_write_ha_state)
-        )
+        self.async_on_remove(self.coordinator.async_add_listener(self.async_write_ha_state))
 
 
 class ApanovaDateUtilizatorSensor(BaseApanovaSensor):
@@ -128,9 +126,7 @@ class ApanovaDateUtilizatorSensor(BaseApanovaSensor):
             if isinstance(info_list, list) and info_list:
                 info = info_list[0]
         addr = (info or {}).get("ConsumptionClientAddress")
-        installation = (info or {}).get("ConsumptionInstallation") or contract.get(
-            "Installation"
-        )
+        installation = (info or {}).get("ConsumptionInstallation") or contract.get("Installation")
         cpcode = (info or {}).get("ConsumptionPointCode")
         meters = (info or {}).get("ConsumptionMeters") or []
         contor = meters[0] if meters else None
@@ -257,12 +253,7 @@ class ApanovaFacturaRestantaSensor(BaseApanovaSensor):
         latest_dt = None
         for it in items:
             d = it.get("DateIn") or it.get("InvoiceDate") or it.get("date")
-            v = (
-                it.get("Sold")
-                or it.get("Total")
-                or it.get("value")
-                or it.get("amount")
-            )
+            v = it.get("Sold") or it.get("Total") or it.get("value") or it.get("amount")
             if v is None:
                 continue
             dt = None
@@ -301,12 +292,7 @@ class ApanovaFacturaRestantaSensor(BaseApanovaSensor):
                 return datetime.min
 
         for it in sorted(items, key=get_dt):
-            v = (
-                it.get("Sold")
-                or it.get("Total")
-                or it.get("value")
-                or it.get("amount")
-            )
+            v = it.get("Sold") or it.get("Total") or it.get("value") or it.get("amount")
             if v is None:
                 continue
             cnt += 1
@@ -428,9 +414,7 @@ class ApanovaIstoricIndexSensor(BaseApanovaSensor):
                         if not (ed and idx):
                             continue
                         try:
-                            sdt = (
-                                datetime.fromisoformat(str(sd)[:10]) if sd else None
-                            )
+                            sdt = datetime.fromisoformat(str(sd)[:10]) if sd else None
                             edt = datetime.fromisoformat(str(ed)[:10])
                             parsed.append((sdt, edt, idx, cons))
                         except Exception:
@@ -456,7 +440,7 @@ class ApanovaIstoricIndexSensor(BaseApanovaSensor):
                             .replace("Apr", "Apr")
                         )
 
-                    for (sdt, edt, idx, cons) in reversed(parsed):
+                    for sdt, edt, idx, cons in reversed(parsed):
                         idxv = idx
                         try:
                             idxv = int(idx)

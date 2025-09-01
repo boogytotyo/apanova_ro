@@ -1,7 +1,9 @@
 from __future__ import annotations
+
 import voluptuous as vol
 from homeassistant import config_entries
-from .const import DOMAIN, CONF_EMAIL, CONF_PASSWORD
+
+from .const import CONF_EMAIL, CONF_PASSWORD, DOMAIN
 
 
 class ApanovaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
