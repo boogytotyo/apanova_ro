@@ -1,13 +1,13 @@
 {
   "domain": "apanova_ro",
   "name": "Apanova România",
-  "version": "0.6.5",
-  "documentation": "https://github.com/boogytotyo/apanova_ro",
-  "issue_tracker": "https://github.com/boogytotyo/apanova_ro/issues",
-  "iot_class": "cloud_polling",
-  "config_flow": true,
-  "integration_type": "hub",
-  "requirements": ["aiohttp>=3.9.1"],
   "codeowners": ["@boogytotyo"],
-  "loggers": ["custom_components.apanova_ro"]
+  "config_flow": true,
+  "documentation": "https://github.com/boogytotyo/apanova_ro",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/boogytotyo/apanova_ro/issues",
+  "loggers": ["custom_components.apanova_ro"],
+  "requirements": ["aiohttp>=3.9.1"],
+  "version": "0.6.5"
 }
