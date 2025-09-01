@@ -1,0 +1,24 @@
+documentation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.md'
+      - 'README*'
+      - 'docs/**'
+
+ci:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/**'
+
+integration:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'custom_components/**'
+      - 'custom_components/apanova_ro/**'
+
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/workflows/**'
+      - 'requirements*.txt'
+      - 'pyproject.toml'
