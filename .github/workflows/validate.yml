@@ -9,8 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # schimbare aici: @main (poți folosi și un tag, ex: @v1)
-      - uses: home-assistant/actions/hassfest@main
+      - uses: home-assistant/actions/hassfest@master
 
   hacs:
     runs-on: ubuntu-latest
@@ -20,4 +19,4 @@ jobs:
         uses: hacs/action@main
         with:
           category: "integration"
-          ignore: "brands"
+          ignore: "brands"   
