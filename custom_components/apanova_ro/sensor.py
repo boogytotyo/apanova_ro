@@ -1,13 +1,16 @@
 from __future__ import annotations
+
 import logging
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any
+
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from .const import DOMAIN, VERSION
+
 from .api import _content
+from .const import DOMAIN, VERSION
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -91,7 +94,9 @@ class BaseApanovaSensor(SensorEntity):
         return False
 
     async def async_added_to_hass(self) -> None:
-        self.async_on_remove(self.coordinator.async_add_listener(self.async_write_ha_state))
+        self.async_on_remove(
+            self.coordinator.async_add_listener(self.async_write_ha_state)
+        )
 
 
 class ApanovaDateUtilizatorSensor(BaseApanovaSensor):
@@ -111,7 +116,7 @@ class ApanovaDateUtilizatorSensor(BaseApanovaSensor):
         return (self.coordinator.data.get("cod") or "").lstrip("0")
 
     @property
-    def extra_state_attributes(self) -> Dict[str, Any]:
+    def extra_state_attributes(self) -> dict[str, Any]:
         d = self.coordinator.data
         u = d.get("user_details") or {}
         payload = (u.get("userData") or {}).get("Payload") or {}
@@ -119,11 +124,13 @@ class ApanovaDateUtilizatorSensor(BaseApanovaSensor):
         contract = _content(d.get("contract") or {})
         info = None
         if isinstance(consumption, dict):
-            l = consumption.get("ConsumptionPointInfo") or []
-            if isinstance(l, list) and l:
-                info = l[0]
+            info_list = consumption.get("ConsumptionPointInfo") or []
+            if isinstance(info_list, list) and info_list:
+                info = info_list[0]
         addr = (info or {}).get("ConsumptionClientAddress")
-        installation = (info or {}).get("ConsumptionInstallation") or contract.get("Installation")
+        installation = (info or {}).get("ConsumptionInstallation") or contract.get(
+            "Installation"
+        )
         cpcode = (info or {}).get("ConsumptionPointCode")
         meters = (info or {}).get("ConsumptionMeters") or []
         contor = meters[0] if meters else None
@@ -187,10 +194,10 @@ class ApanovaArhivaFacturiSensor(BaseApanovaSensor):
         return money_state(latest) if latest is not None else "0,00"
 
     @property
-    def extra_state_attributes(self) -> Dict[str, Any]:
+    def extra_state_attributes(self) -> dict[str, Any]:
         inv = _content(self.coordinator.data.get("invoices") or {})
         invoices = inv.get("Invoices") or []
-        months: Dict[str, Any] = {}
+        months: dict[str, Any] = {}
         for it in invoices:
             d = it.get("DateIn") or it.get("InvoiceDate") or it.get("date")
             amt = it.get("Total") or it.get("value") or it.get("amount")
@@ -250,7 +257,12 @@ class ApanovaFacturaRestantaSensor(BaseApanovaSensor):
         latest_dt = None
         for it in items:
             d = it.get("DateIn") or it.get("InvoiceDate") or it.get("date")
-            v = it.get("Sold") or it.get("Total") or it.get("value") or it.get("amount")
+            v = (
+                it.get("Sold")
+                or it.get("Total")
+                or it.get("value")
+                or it.get("amount")
+            )
             if v is None:
                 continue
             dt = None
@@ -265,10 +277,10 @@ class ApanovaFacturaRestantaSensor(BaseApanovaSensor):
         return money_state(latest_val) if latest_val is not None else "0,00"
 
     @property
-    def extra_state_attributes(self) -> Dict[str, Any]:
+    def extra_state_attributes(self) -> dict[str, Any]:
         unpaid = _content(self.coordinator.data.get("unpaid") or {})
         items = unpaid.get("Invoices") or []
-        attrs: Dict[str, Any] = {}
+        attrs: dict[str, Any] = {}
         if not items:
             attrs["Fara restante"] = ""
             attrs["──────────"] = ""
@@ -279,7 +291,7 @@ class ApanovaFacturaRestantaSensor(BaseApanovaSensor):
             return attrs
         total = 0.0
         cnt = 0
-        amounts: List[str] = []
+        amounts: list[str] = []
 
         def get_dt(it):
             d = it.get("DateIn") or it.get("InvoiceDate") or it.get("date")
@@ -289,7 +301,12 @@ class ApanovaFacturaRestantaSensor(BaseApanovaSensor):
                 return datetime.min
 
         for it in sorted(items, key=get_dt):
-            v = it.get("Sold") or it.get("Total") or it.get("value") or it.get("amount")
+            v = (
+                it.get("Sold")
+                or it.get("Total")
+                or it.get("value")
+                or it.get("amount")
+            )
             if v is None:
                 continue
             cnt += 1
@@ -322,9 +339,9 @@ class ApanovaIndexCurentSensor(BaseApanovaSensor):
         chk = _content(self.coordinator.data.get("check") or {})
         details = None
         if isinstance(chk, dict):
-            l = chk.get("MeterReadingDetails") or []
-            if isinstance(l, list) and l:
-                details = l[0]
+            details_list = chk.get("MeterReadingDetails") or []
+            if isinstance(details_list, list) and details_list:
+                details = details_list[0]
         if isinstance(details, dict):
             v = details.get("LastIndex")
             try:
@@ -337,13 +354,13 @@ class ApanovaIndexCurentSensor(BaseApanovaSensor):
         return None
 
     @property
-    def extra_state_attributes(self) -> Dict[str, Any]:
+    def extra_state_attributes(self) -> dict[str, Any]:
         chk = _content(self.coordinator.data.get("check") or {})
         details = None
         if isinstance(chk, dict):
-            l = chk.get("MeterReadingDetails") or []
-            if isinstance(l, list) and l:
-                details = l[0]
+            details_list = chk.get("MeterReadingDetails") or []
+            if isinstance(details_list, list) and details_list:
+                details = details_list[0]
 
         def pick(o, *ks):
             for k in ks:
@@ -392,10 +409,10 @@ class ApanovaIstoricIndexSensor(BaseApanovaSensor):
         return max(nums) if nums else None
 
     @property
-    def extra_state_attributes(self) -> Dict[str, Any]:
+    def extra_state_attributes(self) -> dict[str, Any]:
         d = self.coordinator.data
         hist = _content(d.get("index_history") or {})
-        attrs: Dict[str, Any] = {}
+        attrs: dict[str, Any] = {}
         try:
             points = hist.get("ConsumptionPoints") or []
             if points:
@@ -411,7 +428,9 @@ class ApanovaIstoricIndexSensor(BaseApanovaSensor):
                         if not (ed and idx):
                             continue
                         try:
-                            sdt = datetime.fromisoformat(str(sd)[:10]) if sd else None
+                            sdt = (
+                                datetime.fromisoformat(str(sd)[:10]) if sd else None
+                            )
                             edt = datetime.fromisoformat(str(ed)[:10])
                             parsed.append((sdt, edt, idx, cons))
                         except Exception:
@@ -437,7 +456,7 @@ class ApanovaIstoricIndexSensor(BaseApanovaSensor):
                             .replace("Apr", "Apr")
                         )
 
-                    for sdt, edt, idx, cons in reversed(parsed):
+                    for (sdt, edt, idx, cons) in reversed(parsed):
                         idxv = idx
                         try:
                             idxv = int(idx)
@@ -481,10 +500,10 @@ class ApanovaCalitateApaSensor(BaseApanovaSensor):
         return water.get("LastUpdateDate")
 
     @property
-    def extra_state_attributes(self) -> Dict[str, Any]:
+    def extra_state_attributes(self) -> dict[str, Any]:
         water = _content(self.coordinator.data.get("water") or {})
         details = water.get("WaterDetails") or []
-        attrs: Dict[str, Any] = {}
+        attrs: dict[str, Any] = {}
         attrs["Sector \t | Clor |  PH  | Turbiditate"] = ""
         for it in details:
             sector = it.get("Sector")
@@ -515,7 +534,7 @@ class ApanovaUpdateSensor(BaseApanovaSensor):
         return f"v{VERSION}"
 
     @property
-    def extra_state_attributes(self) -> Dict[str, Any]:
+    def extra_state_attributes(self) -> dict[str, Any]:
         return {
             "auto_update": False,
             "display_precision": 0,
