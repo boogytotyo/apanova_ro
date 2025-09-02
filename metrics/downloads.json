@@ -1,5 +1,5 @@
 {
-  "generated_at": "2025-09-02T09:07:22.498Z",
+  "generated_at": "2025-09-02T09:13:51.495Z",
   "repository": "boogytotyo/apanova_ro",
   "total_downloads": 5,
   "per_release": [
@@ -7,9 +7,15 @@
       "tag": "0.7.3",
       "name": "0.7.3",
       "prerelease": false,
-      "published_at": "2025-09-02T09:07:14Z",
+      "published_at": "2025-09-02T09:13:43Z",
       "downloads": 0,
-      "assets": []
+      "assets": [
+        {
+          "name": "apanova_ro-0.7.3.zip",
+          "download_count": 0,
+          "browser_download_url": "https://github.com/boogytotyo/apanova_ro/releases/download/0.7.3/apanova_ro-0.7.3.zip"
+        }
+      ]
     },
     {
       "tag": "0.7.2",
@@ -137,6 +143,12 @@
     }
   ],
   "per_asset": [
+    {
+      "tag": "0.7.3",
+      "name": "apanova_ro-0.7.3.zip",
+      "download_count": 0,
+      "browser_download_url": "https://github.com/boogytotyo/apanova_ro/releases/download/0.7.3/apanova_ro-0.7.3.zip"
+    },
     {
       "tag": "0.7.2",
       "name": "apanova_ro-0.7.2.zip",
