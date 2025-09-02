@@ -1,4 +1,6 @@
-name: validate
+name: Validate
+run-name: "✅ Validate • hassfest + HACS • ${{ github.ref_name }}"
+
 on:
   pull_request:
   push:
@@ -6,17 +8,23 @@ on:
 
 jobs:
   hassfest:
+    name: "⚙️ hassfest"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: home-assistant/actions/hassfest@master
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+      - name: 🔧 Run hassfest
+        uses: home-assistant/actions/hassfest@master
 
   hacs:
+    name: "🧩 HACS validation"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: HACS validation
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+      - name: 🔎 HACS validation
         uses: hacs/action@main
         with:
           category: "integration"
-          ignore: "brands"   
+          # Dacă nu ai încă logo/icon în brands, poți ignora temporar:
+          # ignore: "brands"
