@@ -2,7 +2,7 @@ name: release
 on:
   push:
     tags:
-      - "*.*.*"   
+      - "*.*.*"   # ex: 0.7.2
 
 jobs:
   build-and-release:
@@ -13,6 +13,7 @@ jobs:
       - name: Build zip artifact (HACS-compatible)
         run: |
           mkdir -p build
+          # Creează zip-ul cu nume corect, fără spații
           zip -r "build/apanova_ro-${GITHUB_REF_NAME}.zip" custom_components/apanova_ro
 
       - name: Publish GitHub Release
