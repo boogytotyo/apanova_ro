@@ -1,6 +1,14 @@
 {
-  "generated_at": "2025-09-02T02:05:56.254Z",
+  "generated_at": "2025-09-02T07:09:30.178Z",
   "top": [
+    {
+      "tag": "v0.6.7",
+      "name": "fixing versioning name and hacs.json",
+      "prerelease": false,
+      "published_at": "2025-09-02T07:09:22Z",
+      "downloads": 0,
+      "assets": []
+    },
     {
       "tag": "v0.6.6",
       "name": "Name convention update",
