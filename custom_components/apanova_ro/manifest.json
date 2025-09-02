@@ -9,5 +9,5 @@
   "issue_tracker": "https://github.com/boogytotyo/apanova_ro/issues",
   "loggers": ["custom_components.apanova_ro"],
   "requirements": ["aiohttp>=3.9.1"],
-  "version": "v0.7.0"
+  "version": "0.7.0"
 }
