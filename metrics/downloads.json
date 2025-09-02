@@ -1,15 +1,21 @@
 {
-  "generated_at": "2025-09-02T07:47:30.626Z",
+  "generated_at": "2025-09-02T08:25:40.154Z",
   "repository": "boogytotyo/apanova_ro",
   "total_downloads": 4,
   "per_release": [
     {
-      "tag": "v0.7.0",
-      "name": "fixing hacs.json",
+      "tag": "0.7.1",
+      "name": "align manifest version to 0.7.1",
       "prerelease": false,
-      "published_at": "2025-09-02T07:47:22Z",
+      "published_at": "2025-09-02T08:25:31Z",
       "downloads": 0,
-      "assets": []
+      "assets": [
+        {
+          "name": "apanova_ro-0.7.1.zip",
+          "download_count": 0,
+          "browser_download_url": "https://github.com/boogytotyo/apanova_ro/releases/download/0.7.1/apanova_ro-0.7.1.zip"
+        }
+      ]
     },
     {
       "tag": "v0.6.7",
@@ -99,6 +105,12 @@
     }
   ],
   "per_asset": [
+    {
+      "tag": "0.7.1",
+      "name": "apanova_ro-0.7.1.zip",
+      "download_count": 0,
+      "browser_download_url": "https://github.com/boogytotyo/apanova_ro/releases/download/0.7.1/apanova_ro-0.7.1.zip"
+    },
     {
       "tag": "v0.6.7",
       "name": "apanova_ro-0.6.7.zip",
