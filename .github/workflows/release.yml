@@ -2,7 +2,7 @@ name: release
 on:
   push:
     tags:
-      - "*.*.*"   # ex: 0.7.2
+      - "*.*.*"   # ex: 1.0.1
 
 jobs:
   build-and-release:
@@ -10,13 +10,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build zip artifact (HACS-compatible)
+      - name: Build zip artifacts (HACS + human-friendly)
         run: |
           mkdir -p build
-          # Creează zip-ul cu nume corect, fără spații
+          # conținutul corect (doar folderul custom_components/apanova_ro)
           zip -r "build/apanova_ro-${GITHUB_REF_NAME}.zip" custom_components/apanova_ro
+          cp "build/apanova_ro-${GITHUB_REF_NAME}.zip" "build/apanova_ro.zip"
+          # (opțional) checksum
+          sha256sum "build/apanova_ro-${GITHUB_REF_NAME}.zip" > "build/apanova_ro-${GITHUB_REF_NAME}.zip.sha256"
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: build/apanova_ro-${{ github.ref_name }}.zip
+          files: |
+            build/apanova_ro-${{ github.ref_name }}.zip
+            build/apanova_ro-${{ github.ref_name }}.zip.sha256
+            build/apanova_ro.zip
