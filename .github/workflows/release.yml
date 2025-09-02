@@ -1,4 +1,6 @@
-name: release
+name: Release
+run-name: "🚀 Release ${{ github.ref_name }} • build & publish"
+
 on:
   push:
     tags:
@@ -6,29 +8,29 @@ on:
 
 jobs:
   build-and-release:
-    name: Build & Publish
+    name: "📦 Build & 📤 Publish"
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: 📥 Checkout
         uses: actions/checkout@v4
 
-      - name: Build zip artifacts (HACS-compatible structure)
+      - name: 🧱 Build zip artifacts (HACS-compatible structure)
         run: |
           set -e
           TAG="${GITHUB_REF_NAME}"  # ex: 1.0.0
           mkdir -p build
-          # împachetăm CONȚINUTUL directorului custom_components/apanova_ro
+          # împachetăm CONȚINUTUL din custom_components/apanova_ro (nu folderul în sine)
           cd custom_components/apanova_ro
           zip -r "../../build/apanova_ro-${TAG}.zip" . \
             -x "__pycache__/*" -x "*.pyc" -x ".DS_Store"
           cd - >/dev/null
-          # asset cu nume fix pentru HACS (când filename din hacs.json e fix)
+          # asset cu nume fix pentru HACS (filename din hacs.json este constant)
           cp "build/apanova_ro-${TAG}.zip" "build/apanova_ro.zip"
-          # (opțional) checksum pentru varianta versionată
+          # opțional: checksum pentru varianta versionată
           sha256sum "build/apanova_ro-${TAG}.zip" > "build/apanova_ro-${TAG}.zip.sha256"
 
-      - name: Publish GitHub Release
+      - name: 🏷️ Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
