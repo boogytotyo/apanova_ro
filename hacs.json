@@ -5,5 +5,5 @@
   "zip_release": true,
   "filename": "apanova_ro.zip",
   "homeassistant": "2024.6.0",
-  "country": ["RO","FR","EN","DE"]
+  "country": ["RO"]
 }
