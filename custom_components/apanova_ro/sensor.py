@@ -10,7 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import _content
-from .const import DOMAIN, VERSION
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 

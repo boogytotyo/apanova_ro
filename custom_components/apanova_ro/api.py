@@ -1,13 +1,13 @@
 from __future__ import annotations
 
+import asyncio
 import logging
+import time
 from datetime import datetime
 from typing import Any
 
 import aiohttp
-import asyncio
 import async_timeout
-import time
 from homeassistant.core import HomeAssistant
 
 from .const import USER_AGENT
@@ -99,7 +99,7 @@ class ApanovaClient:
                     f"Eroare API {url} → {_explain_status(code)} // payload keys: {list(payload.keys())}"
                 )
             return payload
-        except asyncio.TimeoutError as e:
+        except TimeoutError as e:
             raise ApanovaError(f"Timeout la apelul {url}") from e
         except aiohttp.ClientError as e:
             raise ApanovaError(f"Eroare de rețea la apelul {url}: {e}") from e

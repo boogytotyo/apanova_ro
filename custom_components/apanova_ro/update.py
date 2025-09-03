@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-from datetime import timedelta
-import asyncio
 import logging
-from typing import Any, Optional
+from datetime import timedelta
+from typing import Any
 
 import aiohttp
-from homeassistant.core import HomeAssistant
 from homeassistant.components.update import UpdateEntity, UpdateEntityFeature
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
@@ -53,7 +52,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
                     "release_notes": body,
                     "release_url": html_url,
                 }
-        except (asyncio.TimeoutError, aiohttp.ClientError) as e:
+        except (TimeoutError, aiohttp.ClientError) as e:
             raise UpdateFailed(f"Eroare la interogarea GitHub: {e}") from e
 
     coordinator = DataUpdateCoordinator(
@@ -94,16 +93,16 @@ class ApanovaUpdateEntity(CoordinatorEntity[DataUpdateCoordinator], UpdateEntity
         return self._installed_version
 
     @property
-    def latest_version(self) -> Optional[str]:
+    def latest_version(self) -> str | None:
         latest = (self.coordinator.data or {}).get("latest")
         return latest or self._installed_version  # dacă nu avem date, nu spamăm cu „unknown”
 
     @property
-    def release_url(self) -> Optional[str]:
+    def release_url(self) -> str | None:
         return (self.coordinator.data or {}).get("release_url") or self._fallback_release_url
 
     @property
-    def release_notes(self) -> Optional[str]:
+    def release_notes(self) -> str | None:
         return (self.coordinator.data or {}).get("release_notes")
 
     @property
