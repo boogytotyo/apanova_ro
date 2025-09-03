@@ -69,7 +69,6 @@ async def async_setup_entry(
             ApanovaIndexCurentSensor(coordinator, entry),
             ApanovaIstoricIndexSensor(coordinator, entry),
             ApanovaCalitateApaSensor(coordinator, entry),
-            ApanovaUpdateSensor(coordinator, entry),
         ],
         True,
     )
@@ -500,37 +499,3 @@ class ApanovaCalitateApaSensor(BaseApanovaSensor):
         attrs["friendly_name"] = "Apanova – Calitate apa"
         attrs["icon"] = "mdi:counter"
         return attrs
-
-
-class ApanovaUpdateSensor(BaseApanovaSensor):
-    _attr_name = "Apanova România update"
-
-    def __init__(self, coordinator, entry):
-        super().__init__(coordinator, entry)
-        self.entity_id = "sensor.apanova_ro_update"
-
-    @property
-    def unique_id(self) -> str:
-        return f"{self._entry.entry_id}_update"
-
-    @property
-    def native_value(self):
-        return f"v{VERSION}"
-
-    @property
-    def extra_state_attributes(self) -> dict[str, Any]:
-        return {
-            "auto_update": False,
-            "display_precision": 0,
-            "installed_version": f"v{VERSION}",
-            "in_progress": False,
-            "latest_version": f"v{VERSION}",
-            "release_summary": None,
-            "release_url": f"https://github.com/boogytotyo/apanova_ro/releases/v{VERSION}",
-            "skipped_version": None,
-            "title": None,
-            "update_percentage": None,
-            "entity_picture": "https://brands.home-assistant.io/_/apanova_ro/icon.png",
-            "friendly_name": "Apanova România update",
-            "supported_features": 23,
-        }

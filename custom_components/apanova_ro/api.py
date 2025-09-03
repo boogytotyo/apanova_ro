@@ -5,6 +5,9 @@ from datetime import datetime
 from typing import Any
 
 import aiohttp
+import asyncio
+import async_timeout
+import time
 from homeassistant.core import HomeAssistant
 
 from .const import USER_AGENT
@@ -46,6 +49,10 @@ class ApanovaClient:
         self._login_payload: dict[str, Any] = {}
         self._cached_user_details: dict[str, Any] = {}
 
+        # >>> FIX: protecție pentru logări concurente + momentul ultimei autentificări
+        self._login_lock: asyncio.Lock = asyncio.Lock()
+        self._last_login_ts: float = 0.0  # epoch sec; 0 => nelogat
+
     async def _session_get(self) -> aiohttp.ClientSession:
         if self._session is None or self._session.closed:
             self._session = aiohttp.ClientSession(
@@ -70,17 +77,32 @@ class ApanovaClient:
         if use_auth and self._token:
             headers["x-auth-token"] = self._token
 
-        async with s.request(method, url, json=data, headers=headers) as resp:
-            code = resp.status
-            try:
-                payload = await resp.json(content_type=None)
-            except Exception:
-                payload = {}
+        async def _do():
+            async with async_timeout.timeout(30):
+                async with s.request(method, url, json=data, headers=headers) as resp:
+                    code = resp.status
+                    try:
+                        payload = await resp.json(content_type=None)
+                    except Exception:
+                        payload = {}
+                    return code, payload
+
+        try:
+            code, payload = await _do()
+            if code == 401 and use_auth:
+                # token expirat – relogin și retry o dată
+                await self.login()
+                headers["x-auth-token"] = self._token or ""
+                code, payload = await _do()
             if code >= 400:
                 raise ApanovaError(
                     f"Eroare API {url} → {_explain_status(code)} // payload keys: {list(payload.keys())}"
                 )
             return payload
+        except asyncio.TimeoutError as e:
+            raise ApanovaError(f"Timeout la apelul {url}") from e
+        except aiohttp.ClientError as e:
+            raise ApanovaError(f"Eroare de rețea la apelul {url}: {e}") from e
 
     async def login(self) -> None:
         urls = [
@@ -108,14 +130,32 @@ class ApanovaClient:
                         self._token = token
                         self._user_id = user_id
                         self._login_payload = data
+                        self._last_login_ts = time.time()  # <<< setăm momentul autentificării
                         return
+
                 except Exception as e:
                     last_error = e
         raise ApanovaError(f"Nu s-a putut obține token. Ultima eroare: {last_error}")
 
     async def _ensure_login(self):
-        if not self._token:
-            await self.login()
+        """Login dacă lipsesc credențialele sau dacă au trecut >6h de la ultima autentificare."""
+        need_login = (
+            not self._token
+            or not self._last_login_ts
+            or (time.time() - self._last_login_ts) > 6 * 3600
+        )
+        if not need_login:
+            return
+
+        async with self._login_lock:
+            # verificare din nou în lock (altă corutină poate să fi logat între timp)
+            need_login = (
+                not self._token
+                or not self._last_login_ts
+                or (time.time() - self._last_login_ts) > 6 * 3600
+            )
+            if need_login:
+                await self.login()
 
     async def get_user_details(self) -> dict:
         await self._ensure_login()
