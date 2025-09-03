@@ -1,14 +1,22 @@
 {
-  "generated_at": "2025-09-03T01:57:20.983Z",
+  "generated_at": "2025-09-03T15:08:24.017Z",
   "repository": "boogytotyo/apanova_ro",
-  "total_downloads": 3,
+  "total_downloads": 4,
   "per_release": [
+    {
+      "tag": "1.1.0",
+      "name": "resilient api update",
+      "prerelease": false,
+      "published_at": "2025-09-03T15:08:17Z",
+      "downloads": 0,
+      "assets": []
+    },
     {
       "tag": "1.0.0",
       "name": "1.0.0",
       "prerelease": false,
       "published_at": "2025-09-02T10:37:40Z",
-      "downloads": 1,
+      "downloads": 2,
       "assets": [
         {
           "name": "apanova_ro-1.0.0.zip",
@@ -22,7 +30,7 @@
         },
         {
           "name": "apanova_ro.zip",
-          "download_count": 1,
+          "download_count": 2,
           "browser_download_url": "https://github.com/boogytotyo/apanova_ro/releases/download/1.0.0/apanova_ro.zip"
         }
       ]
@@ -134,7 +142,7 @@
     {
       "tag": "1.0.0",
       "name": "apanova_ro.zip",
-      "download_count": 1,
+      "download_count": 2,
       "browser_download_url": "https://github.com/boogytotyo/apanova_ro/releases/download/1.0.0/apanova_ro.zip"
     },
     {
