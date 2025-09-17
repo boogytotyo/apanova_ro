@@ -55,9 +55,8 @@ Integrare **custom** pentru Home Assistant care afișează datele contului tău 
 
 ## 🛠️ Dezvoltare
 
-- Testare cu **pytest-homeassistant-custom-component**.
 - Validare automată cu **hassfest** și **HACS action**.
-- Stil de cod verificat cu **ruff** și **black**.
+- Cod verificat cu **ruff** și **black**.
 - Workflows GitHub Actions: `lint`, `validate`, `release`.
 
 ---
