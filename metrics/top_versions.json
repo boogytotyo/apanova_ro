@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-10-28T05:41:59.006Z",
+  "generated_at": "2026-10-29T05:47:43.380Z",
   "top": [
     {
       "tag": "1.1.0",
       "name": "resilient api update",
       "prerelease": false,
       "published_at": "2025-09-03T15:08:17Z",
-      "downloads": 3,
+      "downloads": 4,
       "assets": [
         {
           "name": "apanova_ro-1.1.0.zip",
@@ -20,7 +20,7 @@
         },
         {
           "name": "apanova_ro.zip",
-          "download_count": 3,
+          "download_count": 4,
           "browser_download_url": "https://github.com/boogytotyo/apanova_ro/releases/download/1.1.0/apanova_ro.zip"
         }
       ]
